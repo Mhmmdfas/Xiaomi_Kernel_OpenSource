@@ -5375,6 +5375,12 @@ static int usb_reset_and_verify_device(struct usb_device *udev)
 		goto re_enumerate;
 	}
 
+<<<<<<< HEAD
+=======
+	bos = udev->bos;
+	udev->bos = NULL;
+
+>>>>>>> e1f8ad3403eadd41027ddd4cd19bebbc3d0d7fca
 	for (i = 0; i < SET_CONFIG_TRIES; ++i) {
 
 		/* ep0 maxpacket size may change; let the HCD know about it.

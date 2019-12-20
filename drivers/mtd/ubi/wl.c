@@ -142,8 +142,6 @@ static int self_check_in_wl_tree(const struct ubi_device *ubi,
 static int self_check_in_pq(const struct ubi_device *ubi,
 			    struct ubi_wl_entry *e);
 
-<<<<<<< HEAD
-=======
 #ifdef CONFIG_MTD_UBI_FASTMAP
 /**
  * update_fastmap_work_fn - calls ubi_update_fastmap from a work queue
@@ -183,7 +181,6 @@ static int ubi_is_fm_block(struct ubi_device *ubi, int pnum)
 }
 #endif
 
->>>>>>> 437dd510cb6511de951a415ab0554ca3a6355f69
 /**
  * wl_tree_add - add a wear-leveling entry to a WL RB-tree.
  * @e: the wear-leveling entry to add
@@ -441,8 +438,7 @@ static struct ubi_wl_entry *wl_get_wle(struct ubi_device *ubi)
 	rb_erase(&e->u.rb, &ubi->free);
 	ubi->free_count--;
 	dbg_wl("PEB %d EC %d", e->pnum, e->ec);
-<<<<<<< HEAD
-=======
+
 #ifndef CONFIG_MTD_UBI_FASTMAP
 	/* We have to enqueue e only if fastmap is disabled,
 	 * is fastmap enabled prot_queue_add() will be called by
@@ -587,7 +583,6 @@ static struct ubi_wl_entry *get_peb_for_wl(struct ubi_device *ubi)
 	ubi->free_count--;
 	ubi_assert(ubi->free_count >= 0);
 	rb_erase(&e->u.rb, &ubi->free);
->>>>>>> 437dd510cb6511de951a415ab0554ca3a6355f69
 
 	return e;
 }

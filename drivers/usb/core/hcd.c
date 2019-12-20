@@ -2597,12 +2597,8 @@ static void hcd_release(struct kref *kref)
 	struct usb_hcd *hcd = container_of (kref, struct usb_hcd, kref);
 
 	mutex_lock(&usb_port_peer_mutex);
-<<<<<<< HEAD
-	if (hcd->primary_hcd == hcd)
-=======
 	if (usb_hcd_is_primary_hcd(hcd)) {
 		kfree(hcd->address0_mutex);
->>>>>>> 437dd510cb6511de951a415ab0554ca3a6355f69
 		kfree(hcd->bandwidth_mutex);
 	}
 	if (hcd->shared_hcd) {

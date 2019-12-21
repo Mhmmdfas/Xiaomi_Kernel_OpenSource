@@ -4122,6 +4122,8 @@ typedef struct
    char *value;
 }tCfgIniEntry;
 
+disini gan
+
 static VOS_STATUS hdd_apply_cfg_ini( hdd_context_t * pHddCtx,
     tCfgIniEntry* iniTable, unsigned long entries);
 

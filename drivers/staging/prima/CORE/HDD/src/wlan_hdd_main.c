@@ -13890,6 +13890,8 @@ int hdd_wlan_startup(struct device *dev )
    {
       eHalStatus halStatus;
 
+disini gan
+
       /* Set the MAC Address Currently this is used by HAL to
        * add self sta. Remove this once self sta is added as
        * part of session open.

@@ -325,7 +325,11 @@ static int faultin_page(struct task_struct *tsk, struct vm_area_struct *vma,
 	 * reCOWed by userspace write).
 	 */
 	if ((ret & VM_FAULT_WRITE) && !(vma->vm_flags & VM_WRITE))
+<<<<<<< HEAD
 		*flags |= FOLL_COW;
+=======
+	        *flags |= FOLL_COW;
+>>>>>>> 416eaf9e2b036cdb99e38f77a8d9737aaa414c2a
 	return 0;
 }
 

@@ -2640,9 +2640,16 @@ static int dwc3_cleanup_done_reqs(struct dwc3 *dwc, struct dwc3_ep *dep,
 		return 1;
 	}
 
+<<<<<<< HEAD
 	if ((event->status & DEPEVT_STATUS_IOC) &&
 			(trb->ctrl & DWC3_TRB_CTRL_IOC))
 		return 0;
+=======
+	if (usb_endpoint_xfer_isoc(dep->endpoint.desc))
+		if ((event->status & DEPEVT_STATUS_IOC) &&
+				(trb->ctrl & DWC3_TRB_CTRL_IOC))
+			return 0;
+>>>>>>> fe3a15b003c825b978c00b49265811215fae0e3d
 	return 1;
 }
 

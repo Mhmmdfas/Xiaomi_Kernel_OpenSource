@@ -53,7 +53,13 @@ DEVICE(funsoft, FUNSOFT_IDS);
 
 /* Infineon Flashloader driver */
 #define FLASHLOADER_IDS()		\
+<<<<<<< HEAD
 	{ USB_DEVICE(0x8087, 0x0716) }
+=======
+	{ USB_DEVICE_INTERFACE_CLASS(0x058b, 0x0041, USB_CLASS_CDC_DATA) }, \
+	{ USB_DEVICE(0x8087, 0x0716) }, \
+	{ USB_DEVICE(0x8087, 0x0801) }
+>>>>>>> 00faee6d94d4f28425d2a9f77fd433ee4c5207c0
 DEVICE(flashloader, FLASHLOADER_IDS);
 
 /* ViVOpay USB Serial Driver */

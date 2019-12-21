@@ -8107,13 +8107,7 @@ void show_state_filter(unsigned long state_filter)
 			sched_show_task(p);
 	}
 
-<<<<<<< HEAD
-	touch_all_softlockup_watchdogs();
-
-#ifdef CONFIG_SYSRQ_SCHED_DEBUG
-=======
 #ifdef CONFIG_SCHED_DEBUG
->>>>>>> fbdfb6ef0ba0bee5c888e18dd1594a9df08a63af
 	sysrq_sched_debug_show();
 #endif
 	rcu_read_unlock();

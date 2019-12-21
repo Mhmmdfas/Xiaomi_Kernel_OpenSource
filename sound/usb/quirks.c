@@ -158,40 +158,22 @@ static int create_fixed_stream_quirk(struct snd_usb_audio *chip,
 	stream = (fp->endpoint & USB_DIR_IN)
 		? SNDRV_PCM_STREAM_CAPTURE : SNDRV_PCM_STREAM_PLAYBACK;
 	err = snd_usb_add_audio_stream(chip, stream, fp);
-<<<<<<< HEAD
-	if (err < 0) {
-		list_del(&fp->list);
-		kfree(fp);
-		kfree(rate_table);
-		return err;
-	}
-	if (fp->iface != get_iface_desc(&iface->altsetting[0])->bInterfaceNumber ||
-	    fp->altset_idx >= iface->num_altsetting) {
-		list_del(&fp->list);
-		kfree(fp);
-		kfree(rate_table);
-		return -EINVAL;
-=======
+
 	if (err < 0)
 		goto error;
 	if (fp->iface != get_iface_desc(&iface->altsetting[0])->bInterfaceNumber ||
 	    fp->altset_idx >= iface->num_altsetting) {
 		err = -EINVAL;
 		goto error;
->>>>>>> fbdfb6ef0ba0bee5c888e18dd1594a9df08a63af
+
 	}
 	alts = &iface->altsetting[fp->altset_idx];
 	altsd = get_iface_desc(alts);
 	if (altsd->bNumEndpoints < 1) {
-<<<<<<< HEAD
-		list_del(&fp->list);
-		kfree(fp);
-		kfree(rate_table);
-		return -EINVAL;
-=======
+
 		err = -EINVAL;
 		goto error;
->>>>>>> fbdfb6ef0ba0bee5c888e18dd1594a9df08a63af
+
 	}
 
 	fp->protocol = altsd->bInterfaceProtocol;

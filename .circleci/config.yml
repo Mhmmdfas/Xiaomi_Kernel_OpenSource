@@ -5,17 +5,17 @@ jobs:
       - image: mhmmdfas/mydockerimage:latest
     steps:
       - run: git clone --quiet -j32 https://github.com/Mhmmdfas/Xiaomi_Kernel_OpenSource --depth=1 -b test .
-      - run: wget https://raw.githubusercontent.com/Mhmmdfas/scripts-build/master/Q/GCC_Q-rolex
-      - run: chmod +x GCC_Q-rolex
-      - run: bash GCC_Q-rolex
+      - run: wget https://raw.githubusercontent.com/Mhmmdfas/scripts-build/master/miui/rolex
+      - run: chmod +x rolex
+      - run: bash rolex
   compiletoo:
     docker:
       - image: mhmmdfas/mydockerimage:latest
     steps:
       - run: git clone --quiet -j32 https://github.com/Mhmmdfas/Xiaomi_Kernel_OpenSource --depth=1 -b test .
-      - run: wget https://raw.githubusercontent.com/Mhmmdfas/scripts-build/master/Q/GCC_Q-riva
-      - run: chmod +x GCC_Q-riva
-      - run: bash GCC_Q-riva
+      - run: wget https://raw.githubusercontent.com/Mhmmdfas/scripts-build/master/miui/riva
+      - run: chmod +x riva
+      - run: bash riva
 workflows:
   version: 2.1
   cooking:

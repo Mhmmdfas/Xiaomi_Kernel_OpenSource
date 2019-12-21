@@ -848,15 +848,6 @@ static inline void irq_gc_lock(struct irq_chip_generic *gc) { }
 static inline void irq_gc_unlock(struct irq_chip_generic *gc) { }
 #endif
 
-<<<<<<< HEAD
-static inline void irq_reg_writel(struct irq_chip_generic *gc,
-				  u32 val, int reg_offset)
-{
-	if (gc->reg_writel)
-		gc->reg_writel(val, gc->reg_base + reg_offset);
-	else
-		writel(val, gc->reg_base + reg_offset);
-=======
 /*
  * The irqsave variants are for usage in non interrupt code. Do not use
  * them in irq_chip callbacks. Use irq_gc_lock() instead.
@@ -871,20 +862,15 @@ static inline void irq_reg_writel(struct irq_chip_generic *gc,
 				  u32 val, int reg_offset)
 {
 	writel(val, gc->reg_base + reg_offset);
->>>>>>> 00faee6d94d4f28425d2a9f77fd433ee4c5207c0
+
 }
 
 static inline u32 irq_reg_readl(struct irq_chip_generic *gc,
 				int reg_offset)
 {
-<<<<<<< HEAD
-	if (gc->reg_readl)
-		return gc->reg_readl(gc->reg_base + reg_offset);
-	else
-		return readl(gc->reg_base + reg_offset);
-=======
+
 	return readl(gc->reg_base + reg_offset);
->>>>>>> 00faee6d94d4f28425d2a9f77fd433ee4c5207c0
+
 }
 
 #endif /* _LINUX_IRQ_H */

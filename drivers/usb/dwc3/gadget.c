@@ -2607,7 +2607,7 @@ static int dwc3_cleanup_done_reqs(struct dwc3 *dwc, struct dwc3_ep *dep,
 
 			ret = __dwc3_cleanup_done_trbs(dwc, dep, req, trb,
 
-					event, status, chain);
+					trb_len, event, status);
 			if (ret)
 				break;
 		}while (++i < req->request.num_mapped_sgs);

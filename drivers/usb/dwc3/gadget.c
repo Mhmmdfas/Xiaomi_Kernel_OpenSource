@@ -2605,7 +2605,7 @@ static int dwc3_cleanup_done_reqs(struct dwc3 *dwc, struct dwc3_ep *dep,
 			else
 				trb_len = req->request.length;
 
-			ret = dwc3_cleanup_done_trbs(dwc, dep, req, trb,
+			ret = __dwc3_cleanup_done_trbs(dwc, dep, req, trb,
 
 					trb_len, event, status);
 			if (ret)

@@ -1,0 +1,24 @@
+version: 2.1
+jobs:
+  compile:
+    docker:
+      - image: mhmmdfas/mydockerimage:latest
+    steps:
+      - run: git clone --quiet -j32 https://github.com/Mhmmdfas/Xiaomi_Kernel_OpenSource --depth=1 -b staging .
+      - run: wget https://raw.githubusercontent.com/Mhmmdfas/scripts-build/master/miui/rolex
+      - run: chmod +x rolex
+      - run: bash rolex
+  compiletoo:
+    docker:
+      - image: mhmmdfas/mydockerimage:latest
+    steps:
+      - run: git clone --quiet -j32 https://github.com/Mhmmdfas/Xiaomi_Kernel_OpenSource --depth=1 -b staging .
+      - run: wget https://raw.githubusercontent.com/Mhmmdfas/scripts-build/master/miui/riva
+      - run: chmod +x riva
+      - run: bash riva
+workflows:
+  version: 2.1
+  cooking:
+    jobs:
+      - compile
+      - compiletoo

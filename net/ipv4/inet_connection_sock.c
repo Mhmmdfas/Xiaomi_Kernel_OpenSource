@@ -103,6 +103,7 @@ int inet_csk_get_port(struct sock *sk, unsigned short snum)
 	if (!snum) {
 		int remaining, rover, low, high;
 
+again:
 		inet_get_local_port_range(net, &low, &high);
 		remaining = (high - low) + 1;
 		smallest_rover = rover = prandom_u32() % remaining + low;
@@ -174,6 +175,7 @@ have_snum:
 
 		inet_bind_bucket_for_each(tb, &head->chain)
 			if (net_eq(ib_net(tb), net) && tb->port == snum)
+				goto tb_found;
 	}
 	tb = NULL;
 tb_found:

@@ -1721,7 +1721,7 @@ static struct binder_node *binder_get_node_from_ref(
 	struct binder_ref *ref;
 
 	binder_proc_lock(proc);
-	ref = binder_get_ref_olocked(proc, desc, need_strong_ref);
+	ref = binder_get_ref(proc, desc, need_strong_ref);
 	if (!ref)
 		goto err_no_ref;
 	node = ref->node;

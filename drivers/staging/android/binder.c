@@ -1479,8 +1479,70 @@ static void binder_inc_node_tmpref_ilocked(struct binder_node *node)
 
 }
 
-static struct binder_ref *binder_get_ref(struct binder_proc *proc,
-					 u32 desc, bool need_strong_ref)
+/**
+ * binder_inc_node_tmpref() - take a temporary reference on node
+ * @node:	node to reference
+ *
+ * Take reference on node to prevent the node from being freed
+ * while referenced only by a local variable. The inner lock is
+ * needed to serialize with the node work on the queue (which
+ * isn't needed after the node is dead). If the node is dead
+ * (node->proc is NULL), use binder_dead_nodes_lock to protect
+ * node->tmp_refs against dead-node-only cases where the node
+ * lock cannot be acquired (eg traversing the dead node list to
+ * print nodes)
+ */
+static void binder_inc_node_tmpref(struct binder_node *node)
+{
+	binder_node_lock(node);
+	if (node->proc)
+		binder_inner_proc_lock(node->proc);
+	else
+		spin_lock(&binder_dead_nodes_lock);
+	binder_inc_node_tmpref_ilocked(node);
+	if (node->proc)
+		binder_inner_proc_unlock(node->proc);
+	else
+		spin_unlock(&binder_dead_nodes_lock);
+	binder_node_unlock(node);
+}
+
+/**
+ * binder_dec_node_tmpref() - remove a temporary reference on node
+ * @node:	node to reference
+ *
+ * Release temporary reference on node taken via binder_inc_node_tmpref()
+ */
+static void binder_dec_node_tmpref(struct binder_node *node)
+{
+	bool free_node;
+
+	binder_node_inner_lock(node);
+	if (!node->proc)
+		spin_lock(&binder_dead_nodes_lock);
+	node->tmp_refs--;
+	BUG_ON(node->tmp_refs < 0);
+	if (!node->proc)
+		spin_unlock(&binder_dead_nodes_lock);
+	/*
+	 * Call binder_dec_node() to check if all refcounts are 0
+	 * and cleanup is needed. Calling with strong=0 and internal=1
+	 * causes no actual reference to be released in binder_dec_node().
+	 * If that changes, a change is needed here too.
+	 */
+	free_node = binder_dec_node_nilocked(node, 0, 1);
+	binder_node_inner_unlock(node);
+	if (free_node)
+		binder_free_node(node);
+}
+
+static void binder_put_node(struct binder_node *node)
+{
+	binder_dec_node_tmpref(node);
+}
+
+static struct binder_ref *binder_get_ref_olocked(struct binder_proc *proc,
+						 u32 desc, bool need_strong_ref)
 
 {
 	struct rb_node *n = proc->refs_by_desc.rb_node;
@@ -1722,7 +1784,7 @@ static struct binder_node *binder_get_node_from_ref(
 	struct binder_ref *ref;
 
 	binder_proc_lock(proc);
-	ref = binder_get_ref(proc, desc, need_strong_ref);
+	ref = binder_get_ref_olocked(proc, desc, need_strong_ref);
 	if (!ref)
 		goto err_no_ref;
 	node = ref->node;

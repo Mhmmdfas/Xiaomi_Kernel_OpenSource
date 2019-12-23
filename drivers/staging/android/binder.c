@@ -597,7 +597,7 @@ static int binder_update_page_range(struct binder_proc *proc, int allocate,
 	if (end <= start)
 		return 0;
 
-	trace_binder_update_page_range(proc, allocate, start, end);
+	binder_update_page_range(proc, allocate, start, end);
 
 	if (vma)
 		mm = NULL;

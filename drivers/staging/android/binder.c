@@ -1841,7 +1841,7 @@ static int binder_update_ref_for_handle(struct binder_proc *proc,
 	bool delete_ref = false;
 
 	binder_proc_lock(proc);
-	ref = binder_get_ref(proc, desc, strong);
+	ref = binder_get_ref_olocked(proc, desc, strong);
 	if (!ref) {
 		ret = -EINVAL;
 		goto err_no_ref;

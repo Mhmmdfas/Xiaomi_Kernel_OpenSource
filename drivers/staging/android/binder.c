@@ -1541,7 +1541,7 @@ static void binder_put_node(struct binder_node *node)
 	binder_dec_node_tmpref(node);
 }
 
-static struct binder_ref *binder_get_ref_olocked(struct binder_proc *proc,
+static struct binder_ref *binder_get_ref(struct binder_proc *proc,
 						 u32 desc, bool need_strong_ref)
 
 {
@@ -1784,7 +1784,7 @@ static struct binder_node *binder_get_node_from_ref(
 	struct binder_ref *ref;
 
 	binder_proc_lock(proc);
-	ref = binder_get_ref_olocked(proc, desc, need_strong_ref);
+	ref = binder_get_ref(proc, desc, need_strong_ref);
 	if (!ref)
 		goto err_no_ref;
 	node = ref->node;
@@ -1841,13 +1841,13 @@ static int binder_update_ref_for_handle(struct binder_proc *proc,
 	bool delete_ref = false;
 
 	binder_proc_lock(proc);
-	ref = binder_get_ref_olocked(proc, desc, strong);
+	ref = binder_get_ref(proc, desc, strong);
 	if (!ref) {
 		ret = -EINVAL;
 		goto err_no_ref;
 	}
 	if (increment)
-		ret = binder_inc_ref_olocked(ref, strong, NULL);
+		ret = binder_inc_ref(ref, strong, NULL);
 	else
 		delete_ref = binder_dec_ref_olocked(ref, strong);
 

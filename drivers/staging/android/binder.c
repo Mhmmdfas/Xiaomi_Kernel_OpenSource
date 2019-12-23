@@ -1479,9 +1479,6 @@ static void binder_inc_node_tmpref_ilocked(struct binder_node *node)
 
 }
 
-static void binder_inc_node_tmpref(struct binder_node *node)
-}
-
 static struct binder_ref *binder_get_ref(struct binder_proc *proc,
 					 u32 desc, bool need_strong_ref)
 

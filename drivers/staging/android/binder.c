@@ -1479,6 +1479,9 @@ static void binder_inc_node_tmpref_ilocked(struct binder_node *node)
 
 }
 
+static void binder_inc_node_tmpref(struct binder_node *node)
+}
+
 static struct binder_ref *binder_get_ref(struct binder_proc *proc,
 					 u32 desc, bool need_strong_ref)
 
@@ -1778,6 +1781,11 @@ static int binder_update_ref_for_handle(struct binder_proc *proc,
 	struct binder_ref *ref;
 	bool delete_ref = false;
 
+	binder_proc_lock(proc);
+	ref = binder_get_ref(proc, desc, strong);
+	if (!ref) {
+		ret = -EINVAL;
+		goto err_no_ref;
 	}
 	if (increment)
 		ret = binder_inc_ref_olocked(ref, strong, NULL);

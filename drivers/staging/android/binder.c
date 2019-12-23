@@ -597,8 +597,6 @@ static int binder_update_page_range(struct binder_proc *proc, int allocate,
 	if (end <= start)
 		return 0;
 
-	binder_update_page_range(proc, allocate, start, end);
-
 	if (vma)
 		mm = NULL;
 	else
@@ -1608,7 +1606,6 @@ static int binder_translate_binder(struct flat_binder_object *fp,
 	fp->cookie = 0;
 	binder_inc_ref(ref, fp->hdr.type == BINDER_TYPE_HANDLE, &thread->todo);
 
-	trace_binder_transaction_node_to_ref(t, node, ref);
 	binder_debug(BINDER_DEBUG_TRANSACTION,
 		     "        node %d u%016llx -> ref %d desc %d\n",
 		     node->debug_id, (u64)node->ptr,

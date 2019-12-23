@@ -158,7 +158,6 @@ again:
 				snum = smallest_rover;
 				goto have_snum;
 			}
-			goto fail;
 		}
 		/* OK, here is the one we will use.  HEAD is
 		 * non-NULL and we hold it's mutex.
@@ -172,7 +171,6 @@ have_snum:
 
 		if (inet_is_local_reserved_port(net, snum))
 			ret = 1;
-			goto fail_unlock;
 		}
 
 		inet_bind_bucket_for_each(tb, &head->chain)
@@ -180,7 +178,6 @@ have_snum:
 				goto tb_found;
 	}
 	tb = NULL;
-	goto tb_not_found;
 tb_found:
 	if (!hlist_empty(&tb->owners)) {
 		if (sk->sk_reuse == SK_FORCE_REUSE)

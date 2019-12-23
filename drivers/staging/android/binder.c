@@ -1488,11 +1488,11 @@ static struct binder_ref *binder_get_ref(struct binder_proc *proc,
 	while (n) {
 		ref = rb_entry(n, struct binder_ref, rb_node_desc);
 
-		if (desc < ref->desc) {
+		if (desc < ref->data.desc) {
 			n = n->rb_left;
-		} else if (desc > ref->desc) {
+		} else if (desc > ref->data.desc) {
 			n = n->rb_right;
-		} else if (need_strong_ref && !ref->strong) {
+		} else if (need_strong_ref && !ref->data.strong) {
 
 			binder_user_error("tried to use weak ref as strong ref\n");
 			return NULL;

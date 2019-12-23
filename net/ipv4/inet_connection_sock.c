@@ -170,7 +170,8 @@ have_snum:
 				hashinfo->bhash_size)];
 		spin_lock(&head->lock);
 
-		if (inet_is_local_reserved_port(net, snum) {
+		if (inet_is_local_reserved_port(net, snum) &&
+		    !sysctl_reserved_port_bind) {
 			ret = 1;
 			goto fail_unlock;
 		}

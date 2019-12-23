@@ -1478,6 +1478,7 @@ static void binder_inc_node_tmpref_ilocked(struct binder_node *node)
 	node->tmp_refs++;
 }
 
+<<<<<<< HEAD
 /**
  * binder_inc_node_tmpref() - take a temporary reference on node
  * @node:	node to reference
@@ -1542,6 +1543,10 @@ static void binder_put_node(struct binder_node *node)
 
 static struct binder_ref *binder_get_ref_olocked(struct binder_proc *proc,
 						 u32 desc, bool need_strong_ref)
+=======
+static struct binder_ref *binder_get_ref(struct binder_proc *proc,
+					 u32 desc, bool need_strong_ref)
+>>>>>>> v3.18.49
 {
 	struct rb_node *n = proc->refs_by_desc.rb_node;
 	struct binder_ref *ref;
@@ -1549,11 +1554,19 @@ static struct binder_ref *binder_get_ref_olocked(struct binder_proc *proc,
 	while (n) {
 		ref = rb_entry(n, struct binder_ref, rb_node_desc);
 
+<<<<<<< HEAD
 		if (desc < ref->data.desc) {
 			n = n->rb_left;
 		} else if (desc > ref->data.desc) {
 			n = n->rb_right;
 		} else if (need_strong_ref && !ref->data.strong) {
+=======
+		if (desc < ref->desc) {
+			n = n->rb_left;
+		} else if (desc > ref->desc) {
+			n = n->rb_right;
+		} else if (need_strong_ref && !ref->strong) {
+>>>>>>> v3.18.49
 			binder_user_error("tried to use weak ref as strong ref\n");
 			return NULL;
 		} else {
@@ -2759,8 +2772,27 @@ static bool binder_proc_transaction(struct binder_transaction *t,
 	binder_inner_proc_unlock(proc);
 	binder_node_unlock(node);
 
+<<<<<<< HEAD
 	return true;
 }
+=======
+			if (node == NULL) {
+				pr_err("transaction release %d bad node %016llx\n",
+				       debug_id, (u64)fp->binder);
+				break;
+			}
+			binder_debug(BINDER_DEBUG_TRANSACTION,
+				     "        node %d u%016llx\n",
+				     node->debug_id, (u64)node->ptr);
+			binder_dec_node(node, fp->type == BINDER_TYPE_BINDER, 0);
+		} break;
+		case BINDER_TYPE_HANDLE:
+		case BINDER_TYPE_WEAK_HANDLE: {
+			struct binder_ref *ref;
+
+			ref = binder_get_ref(proc, fp->handle,
+					     fp->type == BINDER_TYPE_HANDLE);
+>>>>>>> v3.18.49
 
 /**
  * binder_get_node_refs_for_txn() - Get required refs on node for txn
@@ -2895,6 +2927,7 @@ static void binder_transaction(struct binder_proc *proc,
 		if (tr->target.handle) {
 			struct binder_ref *ref;
 
+<<<<<<< HEAD
 			/*
 			 * There must already be a strong ref
 			 * on this node. If so, do a strong
@@ -2910,6 +2943,10 @@ static void binder_transaction(struct binder_proc *proc,
 						ref->node, &target_proc,
 						&return_error);
 			} else {
+=======
+			ref = binder_get_ref(proc, tr->target.handle, true);
+			if (ref == NULL) {
+>>>>>>> v3.18.49
 				binder_user_error("%d:%d got transaction to invalid handle\n",
 						  proc->pid, thread->pid);
 				return_error = BR_FAILED_REPLY;
@@ -3136,18 +3173,79 @@ static void binder_transaction(struct binder_proc *proc,
 				return_error_line = __LINE__;
 				goto err_translate_failed;
 			}
+<<<<<<< HEAD
 		} break;
 		case BINDER_TYPE_HANDLE:
 		case BINDER_TYPE_WEAK_HANDLE: {
 			struct flat_binder_object *fp;
+=======
+			if (fp->type == BINDER_TYPE_BINDER)
+				fp->type = BINDER_TYPE_HANDLE;
+			else
+				fp->type = BINDER_TYPE_WEAK_HANDLE;
+			fp->binder = 0;
+			fp->handle = ref->desc;
+			fp->cookie = 0;
+			binder_inc_ref(ref, fp->type == BINDER_TYPE_HANDLE,
+				       &thread->todo);
+
+			trace_binder_transaction_node_to_ref(t, node, ref);
+			binder_debug(BINDER_DEBUG_TRANSACTION,
+				     "        node %d u%016llx -> ref %d desc %d\n",
+				     node->debug_id, (u64)node->ptr,
+				     ref->debug_id, ref->desc);
+		} break;
+		case BINDER_TYPE_HANDLE:
+		case BINDER_TYPE_WEAK_HANDLE: {
+			struct binder_ref *ref;
+
+			ref = binder_get_ref(proc, fp->handle,
+					     fp->type == BINDER_TYPE_HANDLE);
+>>>>>>> v3.18.49
 
 			fp = to_flat_binder_object(hdr);
 			ret = binder_translate_handle(fp, t, thread);
 			if (ret < 0) {
 				return_error = BR_FAILED_REPLY;
+<<<<<<< HEAD
 				return_error_param = ret;
 				return_error_line = __LINE__;
 				goto err_translate_failed;
+=======
+				goto err_binder_get_ref_failed;
+			}
+			if (ref->node->proc == target_proc) {
+				if (fp->type == BINDER_TYPE_HANDLE)
+					fp->type = BINDER_TYPE_BINDER;
+				else
+					fp->type = BINDER_TYPE_WEAK_BINDER;
+				fp->binder = ref->node->ptr;
+				fp->cookie = ref->node->cookie;
+				binder_inc_node(ref->node, fp->type == BINDER_TYPE_BINDER, 0, NULL);
+				trace_binder_transaction_ref_to_node(t, ref);
+				binder_debug(BINDER_DEBUG_TRANSACTION,
+					     "        ref %d desc %d -> node %d u%016llx\n",
+					     ref->debug_id, ref->desc, ref->node->debug_id,
+					     (u64)ref->node->ptr);
+			} else {
+				struct binder_ref *new_ref;
+
+				new_ref = binder_get_ref_for_node(target_proc, ref->node);
+				if (new_ref == NULL) {
+					return_error = BR_FAILED_REPLY;
+					goto err_binder_get_ref_for_node_failed;
+				}
+				fp->binder = 0;
+				fp->handle = new_ref->desc;
+				fp->cookie = 0;
+				binder_inc_ref(new_ref, fp->type == BINDER_TYPE_HANDLE, NULL);
+				trace_binder_transaction_ref_to_ref(t, ref,
+								    new_ref);
+				binder_debug(BINDER_DEBUG_TRANSACTION,
+					     "        ref %d desc %d -> ref %d desc %d (node %d)\n",
+					     ref->debug_id, ref->desc, new_ref->debug_id,
+					     new_ref->desc, ref->node->debug_id);
+>>>>>>> v3.18.49
 			}
 		} break;
 
@@ -3191,6 +3289,7 @@ static void binder_transaction(struct binder_proc *proc,
 				return_error_line = __LINE__;
 				goto err_bad_parent;
 			}
+<<<<<<< HEAD
 			ret = binder_translate_fd_array(fda, parent, t, thread,
 							in_reply_to);
 			if (ret < 0) {
@@ -3244,6 +3343,15 @@ static void binder_transaction(struct binder_proc *proc,
 			}
 			last_fixup_obj = bp;
 			last_fixup_min_off = 0;
+=======
+			task_fd_install(target_proc, target_fd, file);
+			trace_binder_transaction_fd(t, fp->handle, target_fd);
+			binder_debug(BINDER_DEBUG_TRANSACTION,
+				     "        fd %d -> %d\n", fp->handle, target_fd);
+			/* TODO: fput? */
+			fp->binder = 0;
+			fp->handle = target_fd;
+>>>>>>> v3.18.49
 		} break;
 		default:
 			binder_user_error("%d:%d got transaction with invalid object type, %x\n",
@@ -3416,6 +3524,7 @@ static int binder_thread_write(struct binder_proc *proc,
 				return -EFAULT;
 
 			ptr += sizeof(uint32_t);
+<<<<<<< HEAD
 			ret = -1;
 			if (increment && !target) {
 				struct binder_node *ctx_mgr_node;
@@ -3435,6 +3544,25 @@ static int binder_thread_write(struct binder_proc *proc,
 				binder_user_error("%d:%d tried to acquire reference to desc %d, got %d instead\n",
 					proc->pid, thread->pid,
 					target, rdata.desc);
+=======
+			if (target == 0 && binder_context_mgr_node &&
+			    (cmd == BC_INCREFS || cmd == BC_ACQUIRE)) {
+				ref = binder_get_ref_for_node(proc,
+					       binder_context_mgr_node);
+				if (ref->desc != target) {
+					binder_user_error("%d:%d tried to acquire reference to desc 0, got %d instead\n",
+						proc->pid, thread->pid,
+						ref->desc);
+				}
+			} else
+				ref = binder_get_ref(proc, target,
+						     cmd == BC_ACQUIRE ||
+						     cmd == BC_RELEASE);
+			if (ref == NULL) {
+				binder_user_error("%d:%d refcount change on invalid ref %d\n",
+					proc->pid, thread->pid, target);
+				break;
+>>>>>>> v3.18.49
 			}
 			switch (cmd) {
 			case BC_INCREFS:
@@ -3668,6 +3796,7 @@ static int binder_thread_write(struct binder_proc *proc,
 			if (get_user(cookie, (binder_uintptr_t __user *)ptr))
 				return -EFAULT;
 			ptr += sizeof(binder_uintptr_t);
+<<<<<<< HEAD
 			if (cmd == BC_REQUEST_DEATH_NOTIFICATION) {
 				/*
 				 * Allocate memory for death notification
@@ -3691,6 +3820,9 @@ static int binder_thread_write(struct binder_proc *proc,
 			}
 			binder_proc_lock(proc);
 			ref = binder_get_ref_olocked(proc, target, false);
+=======
+			ref = binder_get_ref(proc, target, false);
+>>>>>>> v3.18.49
 			if (ref == NULL) {
 				binder_user_error("%d:%d %s invalid ref %d\n",
 					proc->pid, thread->pid,

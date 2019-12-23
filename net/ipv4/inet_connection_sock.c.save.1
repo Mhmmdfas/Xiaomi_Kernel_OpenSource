@@ -103,6 +103,7 @@ int inet_csk_get_port(struct sock *sk, unsigned short snum)
 	if (!snum) {
 		int remaining, rover, low, high;
 
+again:
 		inet_get_local_port_range(net, &low, &high);
 		remaining = (high - low) + 1;
 		smallest_rover = rover = prandom_u32() % remaining + low;
@@ -157,6 +158,7 @@ int inet_csk_get_port(struct sock *sk, unsigned short snum)
 				snum = smallest_rover;
 				goto have_snum;
 			}
+			goto fail;
 		}
 		/* OK, here is the one we will use.  HEAD is
 		 * non-NULL and we hold it's mutex.
@@ -168,14 +170,18 @@ have_snum:
 				hashinfo->bhash_size)];
 		spin_lock(&head->lock);
 
-		if (inet_is_local_reserved_port(net, snum))
+		if (inet_is_local_reserved_port(net, snum) &&
+		    sysctl_reserved_port_bind) {
 			ret = 1;
+			goto fail_unlock;
 		}
 
 		inet_bind_bucket_for_each(tb, &head->chain)
 			if (net_eq(ib_net(tb), net) && tb->port == snum)
+				goto tb_found;
 	}
 	tb = NULL;
+	goto tb_not_found;
 tb_found:
 	if (!hlist_empty(&tb->owners)) {
 		if (sk->sk_reuse == SK_FORCE_REUSE)
